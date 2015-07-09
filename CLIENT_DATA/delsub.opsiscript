@@ -1,0 +1,34 @@
+; Copyright (c) uib gmbh (www.uib.de)
+; This sourcecode is owned by uib gmbh
+; and published under the Terms of the General Public License.
+; credits: http://www.opsi.org/en/credits/
+
+include_append "%ScriptDrive%\lib\check_inno_exitcode.opsiscript"
+
+DefVar	$found$
+Set 	$found$ = "false"
+
+DefVar $UninstallProgram$
+
+Message "Uninstalling " + $ProductId$ + " ..."
+
+if ($SetupType$ = "inno")
+   Set $UninstallProgram$ = $InstallDir$ + "\unins000.exe"
+   if (not($InstallDir$ = '')) and FileExists($UninstallProgram$)
+      comment "Uninstall program found, starting uninstall"
+      Winbatch_uninstall_inno
+      sub_check_exitcode
+   endif
+endif
+
+if (not($InstallDir$ = '')) and (not($InstallDir$ = "not used"))
+   Files_uninstall
+endif
+
+;-----------------------------------------------------
+[Winbatch_uninstall_inno]
+"$UninstallProgram$" /SILENT /NORESTART
+;-----------------------------------------------------
+[Files_uninstall]
+del -sf "$InstallDir$\"
+;-----------------------------------------------------

@@ -1,0 +1,61 @@
+[Package]
+version: 010
+depends: 
+incremental: False
+
+[Product]
+type: localboot
+id: dfn_winscp
+name: WinSCP
+description: Windows-Client fuer SCP
+advice: (Krummel: aktualisiert 17.06.2015)
+version: 5.7.4
+priority: 0
+licenseRequired: False
+productClasses: 
+setupScript: setup.opsiscript
+uninstallScript: uninstall.opsiscript
+updateScript: 
+alwaysScript: 
+onceScript: 
+customScript: 
+userLoginScript: 
+
+[Changelog]
+winscp (5.7.4-010) stable; urgency=low
+
+	* Update
+	* Vorbereitung für $SetupVersion$
+
+-- Detlef Krummel <krummel@gei.de>  17.06.2015 12:14:00
+winscp (5.5.3-1) stable; urgency=low
+
+	* initial: created by opsi-setup-detector
+
+-- Detlef Krummel <krummel@gei.de>  28.04.2014 12:20:15
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

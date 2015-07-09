@@ -1,0 +1,87 @@
+; ----------------------------------------------------------------
+; Copyright (c) uib gmbh (www.uib.de)
+; This sourcecode is owned by uib
+; and published under the Terms of the General Public License.
+; credits: http://www.opsi.org/en/credits/
+; ----------------------------------------------------------------
+
+;****************************************
+; SETUPTYPE      inno
+;****************************************
+; PRODUCTID      winscp
+; SETUPFILE      winscp553setup.exe
+;****************************************
+; SETUPSCRIPT    setup.opsiscript
+; UNINSSCRIPT    uninstall.opsiscript
+;****************************************
+; INSTALLDIR     %ProgramFiles32Dir%\WinSCP
+;****************************************
+
+[Actions]
+requiredWinstVersion >= "4.11.4.4"
+ScriptErrorMessages = false
+setLogLevel = 6
+
+DefVar $SetupType$
+DefVar $ProductId$ 
+DefVar $Setupfile$ 
+DefVar $InstallDir$
+DefVar $MinimumSpace$
+DefVar $ExitCode$
+DefVar $ErrorMsg$
+DefVar $LogDir$
+
+Set $LogDir$ = "%opsiLogDir%"
+
+DefVar $FileNameCheckExitcode$
+include_append "%ScriptPath%\..\lib\check_inno-exitcode.ins"
+
+Set $SetupType$       = "inno"
+Set $ProductId$       = "winscp"
+Set $InstallDir$      = "%ProgramFiles32Dir%\WinSCP"
+Set $MinimumSpace$    = "32 MB"
+
+DefVar	$SetupVersion$
+Set $SetupVersion$	= strPart("%installingProdVersion%", "1", calculate(strPos("%installingProdVersion%","-") + "-" + "1" ))
+Set $Setupfile$		= "winscp"+ $SetupVersion$ +"setup.exe"
+Set $Setupfile$		= "winscp574setup.exe"
+; ----------------------------------------------------------------
+ChangeDirectory "%SCRIPTPATH%"
+
+if not(HasMinimumSpace ("%SystemDrive%", $MinimumSpace$))
+        LogError "Not enough space on %SystemDrive%, " + $MinimumSpace$ + " on drive %SystemDrive% needed for " + $ProductId$
+        isFatalError "No Space"
+else
+        comment "Space OK"
+endif
+if not( FileExists($Setupfile$) )
+        LogError "Setupfile NOT exists (" + $Setupfile$ +")"
+        isFatalError "No Setupfile found"
+else
+        comment "Setupfile exists ..."
+endif 
+
+   comment "Show product picture"
+   ShowBitmap "%ScriptPath%\" + $ProductId$ + ".png" $ProductId$
+
+   if FileExists("%ScriptPath%\delsub.opsiscript")
+      comment "Start uninstall sub section"
+      Sub "%ScriptPath%\delsub.opsiscript"
+   endif
+   
+   Message "Installing %installingProdName%  (%installingProdVersion%)..."
+   comment "Start setup program"
+
+   ChangeDirectory "%SCRIPTPATH%"
+   Winbatch_install_inno
+   Sub_check_exitcode	
+
+; ----------------------------------------------------------------
+; install sections
+; ----------------------------------------------------------------
+[Winbatch_install_inno]
+; http://unattended.sourceforge.net/InnoSetup_Switches_ExitCodes.html
+; You may create setup answer file by: setup.exe /SAVEINF="filename"
+; You may use an answer file by the parameter /LOADINF="filename"
+; "%ScriptPath%\$Setupfile$" /LOADINF="winscp.inf"
+"%ScriptPath%\$Setupfile$" /sp- /silent /norestart /nocancel /SUPPRESSMSGBOXES
