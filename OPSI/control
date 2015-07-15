@@ -28,34 +28,10 @@ winscp (5.7.4-010) stable; urgency=low
 	* Vorbereitung für $SetupVersion$
 
 -- Detlef Krummel <krummel@gei.de>  17.06.2015 12:14:00
+
 winscp (5.5.3-1) stable; urgency=low
 
 	* initial: created by opsi-setup-detector
 
 -- Detlef Krummel <krummel@gei.de>  28.04.2014 12:20:15
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
