@@ -1,3 +1,6 @@
 *.exe
 *.bak
 *.opsi
+*.md5
+orig
+custom

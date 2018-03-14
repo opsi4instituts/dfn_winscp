@@ -1,0 +1,61 @@
+DefFunc SearchRegistryUninstallKeys(val $SearchTerm$ : string) : stringlist
+
+	DefStringList $ResultList$
+	DefStringList $ResultList64$
+	DefStringList $ResultList32$
+	DefVar $SystemType$
+
+	Set $SystemType$ = GetSystemType
+
+	; nur auf 64-Bit-Systemen ausführen
+	if ($SystemType$ = "64 Bit System")
+		; zuerst 64-Bit, daher ausführen mit 'cmd64.exe'
+		Set $ResultList64$ = SearchRegistryBitScope($SearchTerm$, "64", "%SystemRoot%\cmd64.exe")
+		if not (count($ResultList64$) = "0")
+			Set $result$ = $ResultList64$	
+		endif
+	endif
+	; jetzt noch 32-Bit, daher 'cmd.exe'
+	Set $ResultList32$ = SearchRegistryBitScope($SearchTerm$, "32", "%System%\cmd.exe")
+	if not (count($ResultList32$) = "0")
+		Set $result$ = addlisttolist($result$, $ResultList32$)
+	endif
+endfunc
+
+DefFunc SearchRegistryBitScope(val $SearchPattern$ : string, $BitScope$ : string, $PathToCmd$ : string) : stringlist
+	DefStringList $SearchListAll$
+	DefStringList $SearchList$
+	DefStringList $KeyList$
+	DefVar $RegPathUninstall$
+
+	Set $RegPathUninstall$ = "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"
+	Set $SearchListAll$ = getOutStreamFromSection ("execWith_registry_query '$PathToCmd$' /C")
+	; wir wollen aber nur die Zeilen haben, in denen der RegPathUninstall selbst enthalten ist, um z.B. eine MSI-ID zu erhalten
+	Set $SearchList$ = getListContaining($SearchListAll$,$RegPathUninstall$)
+	if not ( count ($SearchList$) = "0" ) 
+		; zusätzlich noch vermerken, in welchem Teil der Registry (32- oder 64bit) der Schlüssel gefunden wurde
+		for %s% in $SearchList$ do Set $KeyList$ = addtolist($KeyList$, $BitScope$ + "|" + "%s%")
+		
+		Set $result$ = $KeyList$
+	endif
+
+	; reg query liefert alle Zeilen, in denen der Suchbegriff gefunden wird, auch z.B. DisplayName
+	[execWith_registry_query]
+	@echo off
+	reg query "$RegPathUninstall$" /s /f "$SearchPattern$"
+endfunc
+
+
+;[Sub_filter_result64]
+; gehe alle Zeilen durch und nimm die Werte nach dem letzten Backslash, aber nur wenn $SearchPattern$ enthalten ist oder eine MSI-ID erkannt wird
+; Installer oder bei 'files_install' sollte die $ProductName$ enthalten sein
+;if (contains("%s%", $SearchPattern$))
+;	Set $ResultList64$ = addtolist($ResultList64$, takeString (-1,splitString("%s%", '\')))
+;endif
+; eine MSI-ID wie z.B. {23170F69-40C1-2702-1512-000001000000} enthält immer diese spezifischen Zeichen: { - }
+;if (contains("%s%", "{") AND contains("%s%", "-") AND contains("%s%", "}"))
+;	if (contains(GetRegistryStringValue64("[" + "%s%" + "] DisplayName"), $SearchPattern$))
+;		;nur MSI-IDs, die zum Produkt gehören sollen übernommen werden
+;		Set $ResultList64$ = addtolist($ResultList64$, takeString (-1,splitString("%s%", '\')))
+;	endif
+;endif

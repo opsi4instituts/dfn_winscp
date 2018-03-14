@@ -1,8 +1,0 @@
-[Setup]
-Lang=de
-Dir=C:\Program Files (x86)\WinSCP
-Group=WinSCP
-NoIcons=0
-SetupType=full
-Components=main,shellext,pageant,puttygen,transl,transl\eng,transl\de
-Tasks=enableupdates,enableupdates\enablecollectusage,desktopicon,desktopicon\common,sendtohook,urlhandler

@@ -1,34 +1,61 @@
-; Copyright (c) uib gmbh (www.uib.de)
-; This sourcecode is owned by uib gmbh
-; and published under the Terms of the General Public License.
-; credits: http://www.opsi.org/en/credits/
+Message "Uninstalling " + $ProductName$ + " ..."
 
-include_append "%ScriptDrive%\lib\check_inno_exitcode.opsiscript"
+; Ergebnis ist StringList (mehrere Einträge möglich);
+; 
+;und mit "|" abgetrennt steht, ob es im 32 oder 64 Bereich der Registry gefunden wurde
+Set $ResultList$ = SearchRegistryUninstallKeys($ProductId$)
 
-DefVar	$found$
-Set 	$found$ = "false"
-
-DefVar $UninstallProgram$
-
-Message "Uninstalling " + $ProductId$ + " ..."
-
-if ($SetupType$ = "inno")
-   Set $UninstallProgram$ = $InstallDir$ + "\unins000.exe"
-   if (not($InstallDir$ = '')) and FileExists($UninstallProgram$)
-      comment "Uninstall program found, starting uninstall"
-      Winbatch_uninstall_inno
-      sub_check_exitcode
-   endif
+if (count($ResultList$) = "0")
+	comment "No installation of " + $SearchProductname$ + " found in Registry. Nothing to do ;-)"
+else
+	comment "Found Installation, uninstalling..."
+	for %r% in $ResultList$ do Sub_uninstall
 endif
 
-if (not($InstallDir$ = '')) and (not($InstallDir$ = "not used"))
-   Files_uninstall
+[Sub_uninstall]
+; Ergebnis z.B. "32|HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\winscp3_is1"
+; Registry-Schlüssel inklusive Pfad, sowie Bereich (32 oder 64); deshalb zunächst aufsplitten
+comment "Getting 'UninstallString' from Registry"
+Set $RegBitScope$ = takeString (0,splitString("%r%", '|'))
+Set $RegId$ = takeString (1,splitString("%r%", '|'))
+
+if ($RegBitScope$ = "32")
+	Set $UninstallProgram$ = GetRegistryStringValue32("[" + $RegId$ + "] UninstallString")
+endif
+if ($RegBitScope$ = "64")
+	Set $UninstallProgram$ = GetRegistryStringValue64("[" + $RegId$ + "] UninstallString")
+endif
+; entferne Anführungszeichen aus RegKey UninstallString
+Set $UninstallProgram$ = takeString (1, splitString ( $UninstallProgram$ , '"')) 
+
+if not (FileExists($UninstallProgram$))
+	LogError "Suspicious! Found entry of installer in Registry, but $UninstallProgramm$ does not exist!?"
+	isFatalError
 endif
 
-;-----------------------------------------------------
+Winbatch_uninstall_inno
+Set $ExitCode$ = getLastExitCode
+if (isInnoExitcodeFatal($ExitCode$, "True", $ErrorString$) = "true")
+        isFatalError
+endif
+
+if $DesktopLink$ = "true"
+	comment "Delete common desktop link"
+	Linkfolder_delete_desktoplink	
+endif
+	
+comment "include custom post deinstall file"
+set $CustomPostDeinstall$ = getProductProperty("custom-post-deinstall","none")
+if not ($CustomPostDeinstall$ = "none")
+	if FileExists("%ScriptPath%\custom\" + $CustomPostDeinstall$)
+		include_insert "%ScriptPath%\custom\" + $CustomPostDeinstall$
+	endif
+endif
+
 [Winbatch_uninstall_inno]
-"$UninstallProgram$" /SILENT /NORESTART
-;-----------------------------------------------------
-[Files_uninstall]
-del -sf "$InstallDir$\"
-;-----------------------------------------------------
+"$UninstallProgram$" $SilentOption$ /norestart /SUPPRESSMSGBOXES /nocancel
+
+[Linkfolder_delete_desktoplink]
+set_basefolder common_desktopdirectory
+set_subfolder ""
+delete_element $ProductName$

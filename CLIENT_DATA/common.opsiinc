@@ -1,0 +1,60 @@
+requiredWinstVersion >= "4.12.0.13"
+
+DefVar $UninstallProgram$
+DefVar $SetupFile$
+DefVar $LogDir$
+DefVar $ErrorString$
+DefVar $ExitCode$
+DefVar $ProductId$
+DefVar $ProductName$
+DefVar $MinimumSpace$
+DefVar $InstallDir$
+DefVar $PathToExe$
+DefVar $RegId$
+DefVar $RegBitScope$
+DefVar $MSVersion$
+DefVar $INST_SystemType$
+DefVar $CustomPostInstall$
+DefVar $CustomPostDeinstall$
+DefVar $DesktopLink$
+DefVar $SilentOption$
+DefVar $SearchPattern$
+DefStringList $ResultList$
+DefVar $ProductVersion$
+
+Set $INST_SystemType$ = GetSystemType
+Set $MSVersion$	 = GetMsVersionInfo
+Set $LogDir$ = "%opsiLogDir%"
+
+Set $ProductVersion$ = takestring (0, splitString("%installingProdVersion%", "-"))
+Set $DesktopLink$ = getProductProperty("desktop-link","false")
+Set $SilentOption$ = getProductProperty("silent-option", "/silent")
+
+; ----------------------------------------------------------------
+Set $ProductId$ = "winscp"
+Set $ProductName$ = "WinSCP"
+Set $MinimumSpace$ = "32 MB"
+;Set $RegPathUninstall$ = "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"
+Set $SetupFile$ = "WinSCP-" + $ProductVersion$ + "-Setup.exe"
+; ----------------------------------------------------------------
+
+; exitcode library von UIB (siehe C:\program files(x86)\opsi.org\opsi-client-agent\opsi-winst\lib) mit 'local functions'
+importLib "uib_exitcode.opsiscript::isInnoExitcodeFatal"
+; Library registry search uninstall keys (local functions)
+importLib "func_search_registry_uninstall_keys.opsiinc"
+
+if not ($MSVersion$ = "6.1" OR $MSVersion$ = "10.0")
+	Logwarning "Only tested with windows 7 and 10! Please report to the maintainer successful installation on other windows versions."		
+endif
+if not ($INST_SystemType$ = "64 Bit System")
+	Logwarning "Only tested with 64 bit version! Please report to the maintainer successful installation on other windows versions."
+endif
+
+comment "Show product picture"
+if (FileExists("%ScriptPath%\..\lib\icons\%installingProdName%.png"))
+       comment "logo at local library/icons found."
+       ShowBitmap "%ScriptPath%\..\lib\icons\%installingProdName%.png" $ProductName$
+else
+       comment "no logo at local library/icons, use from ScriptPath ..."
+       ShowBitmap "%ScriptPath%\o4i.png" $ProductName$
+endif
