@@ -29,6 +29,8 @@ if (isInnoExitcodeFatal($ExitCode$, "True", $ErrorString$) = "true")
 endif
 
 Set $ResultList$ = SearchRegistryUninstallKeys($ProductId$)
+; erste Zeile ist Status, da momentan (!) eine Funktion immer einen Rückgabewert haben muss. Abschneiden...
+Set $ResultList$ = getSubList(1 : ,$ResultList$)
 
 if (count($ResultList$) = "0")
 	logError "Fatal: After Installation " + $ProductName$ + " could not be found in Registry"

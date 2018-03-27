@@ -4,6 +4,8 @@ Message "Uninstalling " + $ProductName$ + " ..."
 ; 
 ;und mit "|" abgetrennt steht, ob es im 32 oder 64 Bereich der Registry gefunden wurde
 Set $ResultList$ = SearchRegistryUninstallKeys($ProductId$)
+; erste Zeile ist Status, da momentan (!) eine Funktion immer einen Rückgabewert haben muss. Abschneiden...
+Set $ResultList$ = getSubList(1 : ,$ResultList$)
 
 if (count($ResultList$) = "0")
 	comment "No installation of " + $SearchProductname$ + " found in Registry. Nothing to do ;-)"

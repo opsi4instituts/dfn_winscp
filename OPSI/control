@@ -1,5 +1,5 @@
 [Package]
-version: 2
+version: 3
 depends: 
 incremental: False
 
@@ -55,6 +55,11 @@ values: ["/silent", "/verysilent"]
 default: ["/silent"]
 
 [Changelog]
+dfn_winscp (5.13-3)
+	* verbesserte "func_search_registry_uninstall_keys.opsiinc"
+	* Kopie "uib_exitcode.opsiscript" ins Paket
+-- Thomas Besser (archIT/KIT) <thomas.besser@kit.edu>, 27.03.2018
+
 dfn_winscp (5.13-2)
 	* opsi-winst => 4.12.0.13 erforderlich (https://forum.opsi.org/viewtopic.php?f=1&t=9885, "osparser / osdefinedfunctions: call from a local function an other
 local function using a local variable as call by value parameter")
