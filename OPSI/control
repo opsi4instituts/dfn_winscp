@@ -1,5 +1,5 @@
 [Package]
-version: 3
+version: 2
 depends: 
 incremental: False
 
@@ -9,7 +9,7 @@ id: dfn_winscp
 name: WinSCP
 description: Werkzeug für sicheren Dateitransfer (SFTP, SCP, FTPS)
 advice: 
-version: 5.13
+version: 5.13.1
 priority: 0
 licenseRequired: False
 productClasses: 
@@ -55,11 +55,14 @@ values: ["/silent", "/verysilent"]
 default: ["/silent"]
 
 [Changelog]
+dfn_winscp (5.13-1-1)
+        * minor update, only .exe changed
+-- Detlef Krummel <krummel@gei.de>  04.04.2018
+
 dfn_winscp (5.13-3)
 	* verbesserte "func_search_registry_uninstall_keys.opsiinc"
 	* Kopie "uib_exitcode.opsiscript" ins Paket
 -- Thomas Besser (archIT/KIT) <thomas.besser@kit.edu>, 27.03.2018
-
 dfn_winscp (5.13-2)
 	* opsi-winst => 4.12.0.13 erforderlich (https://forum.opsi.org/viewtopic.php?f=1&t=9885, "osparser / osdefinedfunctions: call from a local function an other
 local function using a local variable as call by value parameter")
@@ -133,37 +136,3 @@ winscp (5.7.4-010) stable; urgency=low
 winscp (5.5.3-1) stable; urgency=low
 	* initial: created by opsi-setup-detector
 -- Detlef Krummel <krummel@gei.de>  28.04.2014 12:20:15
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
