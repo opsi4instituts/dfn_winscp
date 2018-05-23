@@ -1,4 +1,4 @@
-requiredWinstVersion >= "4.12.0.13"
+requiredWinstVersion >= "4.12.0.16"
 
 DefVar $UninstallProgram$
 DefVar $SetupFile$
@@ -21,6 +21,7 @@ DefVar $SilentOption$
 DefVar $SearchPattern$
 DefStringList $ResultList$
 DefVar $ProductVersion$
+DefVar $InstalledVersion$
 
 Set $INST_SystemType$ = GetSystemType
 Set $MSVersion$	 = GetMsVersionInfo

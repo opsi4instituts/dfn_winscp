@@ -1,79 +1,37 @@
 DefFunc SearchRegistryUninstallKeys(val $SearchTerm$ : string) : stringlist
-
 	DefStringList $ResultList$
-	DefStringList $ResultList64$
-	DefStringList $ResultList32$
+	DefStringList $KeyList$
+	DefVar $RegPathUninstall$
+	DefVar $KeyPath$
+	DefVar $DisplayName$
+	DefVar $RegBitScope$
 	DefVar $SystemType$
-	DefVar $Status$
 
-	Set $Status$ = $SearchTerm$
 	Set $SystemType$ = GetSystemType
+	Set $RegPathUninstall$ = "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"
 
 	; nur auf 64-Bit-Systemen ausführen
 	if ($SystemType$ = "64 Bit System")
-		; zuerst 64-Bit, daher ausführen mit 'cmd64.exe'
-		Set $ResultList64$ = SearchRegistryBitScope($SearchTerm$, "64", "%SystemRoot%\cmd64.exe")
-		if (takeString(0, $ResultList64$) = "null")
-			Set $ResultList64$ = emptyList($ResultList64$)
-		endif
-			Set $Status$ = $Status$ + "|64:" + count($ResultList64$)
-		endif
-	; jetzt noch 32-Bit, daher 'cmd.exe'
-	Set $ResultList32$ = SearchRegistryBitScope($SearchTerm$, "32", "%System%\cmd.exe")
-	if (takeString(0, $ResultList32$) = "null")
-		Set $ResultList32$ = emptyList($ResultList32$)
+		; zuerst 64-Bit
+		Set $KeyList$ = getRegistryKeyList64($RegPathUninstall$)
+		Set $RegBitScope$ = "64bit"
+		for %k% in $KeyList$ do Sub_search_in_keys
 	endif
-	Set $Status$ = $Status$ + "|32:" + count($ResultList32$)
-	; eine Funktion muss momentan immer etwas zurückliefern, deswegen Regsuche hat nichts gefunden => "null"
-	; diese Funktion liefert im ersten Stringlistenfeld immer einen Status zurück: Suchbegriff|64:<Anzahl Treffer|32:<Anzahl Treffer>
-	Set $result$ = createStringList($Status$)
-	if not (count($ResultList64$) = "0")
-		Set $result$ = addlisttolist($result$, $ResultList64$)
-	endif
-	if not (count($ResultList32$) = "0")
-		Set $result$ = addlisttolist($result$, $ResultList32$)
-	endif
-endfunc
+	; jetzt 32-Bit
+	Set $KeyList$ = getRegistryKeyList32($RegPathUninstall$)
+	Set $RegBitScope$ = "32bit"
+	for %k% in $KeyList$ do Sub_search_in_keys
 
-DefFunc SearchRegistryBitScope(val $SearchPattern$ : string, $BitScope$ : string, $PathToCmd$ : string) : stringlist
-	DefStringList $SearchListAll$
-	DefStringList $SearchList$
-	DefStringList $KeyList$
-	DefVar $RegPathUninstall$
-	DefVar $DisplayName$
+	Set $result$ = $ResultList$	
 
-	Set $RegPathUninstall$ = "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"
-	Set $SearchListAll$ = getOutStreamFromSection ("execWith_registry_query '$PathToCmd$' /C")
-	; wir wollen aber nur die Zeilen haben, in denen der RegPathUninstall selbst enthalten ist, um z.B. eine MSI-ID zu erhalten
-	Set $SearchList$ = getListContaining($SearchListAll$,$RegPathUninstall$)
-	if not (count($SearchList$) = "0")
-		for %s% in $SearchList$ do Sub_result_check
+	[Sub_search_in_keys]
+	Set $KeyPath$ = $RegPathUninstall$ + "\%k%"
+	if RegVarExists($KeyPath$, "DisplayName", $RegBitScope$)
+		Set $DisplayName$ = getRegistryValue($KeyPath$, "DisplayName", $RegBitScope$)
+		; Check DisplayName auf Suchbegriff, alles lower damit case-insensitive
+		if (contains(lower($DisplayName$), lower($SearchTerm$)))
+			; zusätzlich noch vermerken, in welchem Teil der Registry (32- oder 64bit) der Schlüssel gefunden wurde. Auch DisplayName mitliefern
+			Set $ResultList$ = addtolist($ResultList$, $KeyPath$ + "|" + $RegBitScope$ + "|" + $DisplayName$)
+		endif		
 	endif
-	if (count($KeyList$) = "0")
-		set $result$ = createSTringList("null")
-	else
-		Set $result$ = $KeyList$
-	endif
-
-	; wir durchsuchen rekursiv alle Keys bzw. Schlüssel. Es kann vorkommen, dass z.B. ein Schlüssel den Namen des Suchbegriffes hat
-	; so geschehen bei z.B. "Sketchup": dieser Begriff wurde auch bei einem Autodesk-Produkt gefunden, das ein "Sketchup"-Plugin bereitgestellt hat
-	; Oder ein VCRedist wurde durch ein anderes Produkt mit installiert und in "InstallSource" ist der Produktname dann evtl. enthalten.
-	; deshalb soll/muss das Ergebnis nochmal über die Registry geprüft werden, ob "DisplayName" den Suchbegriff enthält. Nur dann als Ergebnis der Keylist hinzufügen
-	[Sub_result_check]
-	; es ist hier kein Check mehr nötig, ob evtl. nur ein 32-Bit-System gerade läuft, da das beim Setzen von $BitScope$ schon gemacht wird.
-	if ($BitScope$ = "64")
-		Set $DisplayName$ = GetRegistryStringValue64("[" + "%s%" + "] DisplayName")
-	else
-		Set $DisplayName$ = GetRegistryStringValue32("[" + "%s%" + "] DisplayName")
-	endif
-	; da 'contains' case-sensitive ist beide Werte lowern
-	if (contains(lower($DisplayName$), lower($SearchPattern$)))	
-		; zusätzlich noch vermerken, in welchem Teil der Registry (32- oder 64bit) der Schlüssel gefunden wurde
-		Set $KeyList$ = addtolist($KeyList$, $BitScope$ + "|" + "%s%")
-	endif
-
-	; reg query liefert alle Zeilen, in denen der Suchbegriff gefunden wird, auch z.B. DisplayName
-	[execWith_registry_query]
-	@echo off
-	reg query "$RegPathUninstall$" /s /f "$SearchPattern$"
 endfunc

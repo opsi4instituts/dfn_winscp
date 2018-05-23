@@ -1,32 +1,23 @@
 Message "Uninstalling " + $ProductName$ + " ..."
 
 ; Ergebnis ist StringList (mehrere Einträge möglich);
-; 
-;und mit "|" abgetrennt steht, ob es im 32 oder 64 Bereich der Registry gefunden wurde
+; in einer Zeile werden drei Ergebnisse mit "|" abgetrennt geliefert: Registrykey (mit Pfad) | Bereich Registry (kann direkt getRegistryValue übergeben werden | DisplayName
+; z.B. HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Test64|64bit|Test Registry Entry64
 Set $ResultList$ = SearchRegistryUninstallKeys($ProductId$)
-; erste Zeile ist Status, da momentan (!) eine Funktion immer einen Rückgabewert haben muss. Abschneiden...
-Set $ResultList$ = getSubList(1 : ,$ResultList$)
 
 if (count($ResultList$) = "0")
-	comment "No installation of " + $SearchProductname$ + " found in Registry. Nothing to do ;-)"
+	comment "No installation of " + $Productname$ + " found in Registry. Nothing to do ;-)"
 else
 	comment "Found Installation, uninstalling..."
 	for %r% in $ResultList$ do Sub_uninstall
 endif
 
 [Sub_uninstall]
-; Ergebnis z.B. "32|HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\winscp3_is1"
-; Registry-Schlüssel inklusive Pfad, sowie Bereich (32 oder 64); deshalb zunächst aufsplitten
 comment "Getting 'UninstallString' from Registry"
-Set $RegBitScope$ = takeString (0,splitString("%r%", '|'))
-Set $RegId$ = takeString (1,splitString("%r%", '|'))
+Set $RegId$ = takeString (0,splitString("%r%", '|'))
+Set $RegBitScope$ = takeString (1,splitString("%r%", '|'))
 
-if ($RegBitScope$ = "32")
-	Set $UninstallProgram$ = GetRegistryStringValue32("[" + $RegId$ + "] UninstallString")
-endif
-if ($RegBitScope$ = "64")
-	Set $UninstallProgram$ = GetRegistryStringValue64("[" + $RegId$ + "] UninstallString")
-endif
+Set $UninstallProgram$ = GetRegistryValue($RegId$, "UninstallString", $RegBitScope$)
 ; entferne Anführungszeichen aus RegKey UninstallString
 Set $UninstallProgram$ = takeString (1, splitString ( $UninstallProgram$ , '"')) 
 
@@ -37,7 +28,7 @@ endif
 
 Winbatch_uninstall_inno
 Set $ExitCode$ = getLastExitCode
-if (isInnoExitcodeFatal($ExitCode$, "True", $ErrorString$) = "true")
+if stringToBool(isInnoExitcodeFatal($ExitCode$, "True", $ErrorString$))
         isFatalError
 endif
 

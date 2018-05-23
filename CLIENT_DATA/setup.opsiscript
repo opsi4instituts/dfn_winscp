@@ -24,13 +24,11 @@ Message "Installing %installingProdName% (%installingProdVersion%) ..."
 comment "Start setup program"
 Winbatch_install_inno
 Set $ExitCode$ = getLastExitCode
-if (isInnoExitcodeFatal($ExitCode$, "True", $ErrorString$) = "true")
+if stringToBool(isInnoExitcodeFatal($ExitCode$, "True", $ErrorString$))
         isFatalError
 endif
 
 Set $ResultList$ = SearchRegistryUninstallKeys($ProductId$)
-; erste Zeile ist Status, da momentan (!) eine Funktion immer einen Rückgabewert haben muss. Abschneiden...
-Set $ResultList$ = getSubList(1 : ,$ResultList$)
 
 if (count($ResultList$) = "0")
 	logError "Fatal: After Installation " + $ProductName$ + " could not be found in Registry"
@@ -39,16 +37,18 @@ else
 	comment "Successful Installation"
 
 	;sollte nur einen Treffer, daher nur erste Zeile nehmen
-	Set $RegBitScope$ = takeString (0,splitString(takeString(0,$ResultList$), '|'))
-	Set $RegId$ = takeString (1,splitString(takeString(0,$ResultList$), '|'))
+	Set $RegId$ = takeString (0,splitString(takeString(0,$ResultList$), '|'))
+	Set $RegBitScope$ = takeString (1,splitString(takeString(0,$ResultList$), '|'))
+
+	; check version
+	Set $InstalledVersion$ = GetRegistryValue($RegId$, "DisplayVersion", $RegBitScope$)
+	if not ($ProductVersion$ = $InstalledVersion$)
+		logError "Fatal: Versions (package <-> installed) does not match)"
+		isFatalError
+	endif
 
 	comment "Get 'DisplayIcon' from registry for path to exe"
-	if ($RegBitScope$ = "32")
-		Set $PathToExe$ = GetRegistryStringValue32("[" + $RegId$ + "] DisplayIcon")
-	endif
-	if ($RegBitScope$ = "64")
-		Set $PathToExe$ = GetRegistryStringValue64("[" + $RegId$ + "] DisplayIcon")
-	endif
+	Set $PathToExe$ = GetRegistryValue($RegId$, "DisplayIcon", $RegBitScope$)
 
 	if $DesktopLink$ = "true"
 		comment "Create common desktop link"
@@ -64,8 +64,6 @@ else
 	endif
 
 endif
-
-; zusätzlich Versionsüberprüfung aus PathToExe?
 
 [Winbatch_install_inno]
 ; http://unattended.sourceforge.net/InnoSetup_Switches_ExitCodes.html
