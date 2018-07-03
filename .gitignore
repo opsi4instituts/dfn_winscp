@@ -2,5 +2,13 @@
 *.bak
 *.opsi
 *.md5
+*.lst
+*.sh
+*.version
+*.txt
+*.date
+*.png
+*~
+TMP/
 orig
 custom

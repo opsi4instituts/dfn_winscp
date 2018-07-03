@@ -88,16 +88,14 @@ local function using a local variable as call by value parameter")
 	* Rewrite gem. o4i-Richtlinien (custom, desktop-icon, logo, silent)
 	* common.opsiinc & Registry-Suche nach vorhandenen Installationen (local function)
 	* ExitCode-Prüfung via 'uib_exitcode.opsiscript' (in opsi-winst ab Version 4.12.0 enthalten, nutzt auch local function)
--- Thomas Besser (archIT/KIT) <thomas.besser@kit.edu>, 05.03.2018
 
+-- Thomas Besser (archIT/KIT) <thomas.besser@kit.edu>, 05.03.2018
 winscp (5.13-028) stable; urgency=low
         * minor update, only .exe changed
 -- Detlef Krummel <krummel@gei.de>  18.02.2018
-
 winscp (5.11.3-027) stable; urgency=low
 	* minor update, only .exe changed
 -- Detlef Krummel <krummel@gei.de>  18.12.2017
-
 winscp (5.11.2-026) stable; urgency=low
 	* minor update
 -- Detlef Krummel <krummel@gei.de>  11.10.2017
