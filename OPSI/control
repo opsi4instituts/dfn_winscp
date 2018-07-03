@@ -1,7 +1,6 @@
 [Package]
-version: 1
+version: 3
 depends: 
-incremental: False
 
 [Product]
 type: localboot
@@ -9,7 +8,7 @@ id: dfn_winscp
 name: WinSCP
 description: Werkzeug für sicheren Dateitransfer (SFTP, SCP, FTPS)
 advice: 
-version: 5.13.2
+version: 5.13.3
 priority: 0
 licenseRequired: False
 productClasses: 
@@ -55,7 +54,19 @@ values: ["/silent", "/verysilent"]
 default: ["/silent"]
 
 [Changelog]
-dfn_winscp (5.13.2-1)
+dfn_winscp (5.13.3-3)
+	* Regression (alte Skripte vor 5.13-2 reaktiviert) gefixt
+-- Thomas Besser (archIT/KIT) <thomas.besser@kit.edu>, 27.06.2018
+
+dfn_winscp (5.13.3-2)
+        * minor update, only .exe changed
+-- Detlef Krummel <krummel@gei.de>  21.06.2018
+
+dfn_winscp (5.13.2-2)
+        * minor update, only .exe changed
+-- Detlef Krummel <krummel@gei.de>  11.05.2018
+
+dfn_winscp (5.13.1-2)
 	* neue Upstreamversion (Binary)
 	* Fix für isInnoExitcodeFatal (uib_exitcode)
 	* neueste Funktion Registry-Suche
