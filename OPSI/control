@@ -9,7 +9,7 @@ id: dfn_winscp
 name: WinSCP
 description: Werkzeug für sicheren Dateitransfer (SFTP, SCP, FTPS)
 advice: 
-version: 5.13.3
+version: 5.13.4
 priority: 0
 licenseRequired: False
 productClasses: 
@@ -55,14 +55,25 @@ values: ["/silent", "/verysilent"]
 default: ["/silent"]
 
 [Changelog]
+dfn_winscp (5.13.4-1)
+
+        * minor update, only .exe changed
+
+-- Detlef Krummel <krummel@gei.de>  01.09.2018
+
 dfn_winscp (5.13.3-1)
         * minor update, only .exe changed
 -- Detlef Krummel <krummel@gei.de>  21.06.2018
-
 dfn_winscp (5.13.2-1)
         * minor update, only .exe changed
 -- Detlef Krummel <krummel@gei.de>  11.05.2018
 dfn_winscp (5.13-1-1)
+	* neue Upstreamversion (Binary)
+	* Fix für isInnoExitcodeFatal (uib_exitcode)
+	* neueste Funktion Registry-Suche
+	* Verwendung von getRegistryValue bzw. RegVarExists (benötigt opsi-winst 4.12.0.16)
+-- Thomas Besser (archIT/KIT) <thomas.besser@kit.edu>, 23.05.2018
+dfn_winscp (5.13.1-1)
         * minor update, only .exe changed
 -- Detlef Krummel <krummel@gei.de>  04.04.2018
 dfn_winscp (5.13-3)
