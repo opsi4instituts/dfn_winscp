@@ -35,7 +35,6 @@ Set $SilentOption$ = getProductProperty("silent-option", "/silent")
 Set $ProductId$ = "winscp"
 Set $ProductName$ = "WinSCP"
 Set $MinimumSpace$ = "32 MB"
-;Set $RegPathUninstall$ = "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"
 Set $SetupFile$ = "WinSCP-" + $ProductVersion$ + "-Setup.exe"
 ; ----------------------------------------------------------------
 
