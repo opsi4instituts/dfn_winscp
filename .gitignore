@@ -2,6 +2,7 @@
 *.bak
 *.opsi
 *.md5
+*.zsync
 *.lst
 *.sh
 *.version
