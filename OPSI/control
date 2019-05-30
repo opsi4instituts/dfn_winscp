@@ -9,7 +9,7 @@ id: dfn_winscp
 name: WinSCP
 description: Werkzeug für sicheren Dateitransfer (SFTP, SCP, FTPS)
 advice: 
-version: 5.13.7
+version: 5.15.2
 priority: 0
 licenseRequired: False
 productClasses: 
@@ -55,12 +55,21 @@ values: ["/silent", "/verysilent"]
 default: ["/silent"]
 
 [Changelog]
-dfn_winscp (5.13.7-1)
+dfn_winscp (5.15.2-1)
 
         * minor update, only .exe changed
 
--- Detlef Krummel <krummel@gei.de>  9.1.2019
+-- Detlef Krummel <krummel@gei.de>  30.5.2019
 
+dfn_winscp (5.15.1-1)
+        * minor update, only .exe changed
+-- Detlef Krummel <krummel@gei.de>  11.4.2019
+dfn_winscp (5.13.9-1)
+        * minor update, only .exe changed
+-- Detlef Krummel <krummel@gei.de>  20.3.2019
+dfn_winscp (5.13.7-1)
+        * minor update, only .exe changed
+-- Detlef Krummel <krummel@gei.de>  9.1.2019
 dfn_winscp (5.13.6-1)
         * minor update, only .exe changed
 -- Detlef Krummel <krummel@gei.de>  13.12.2018
